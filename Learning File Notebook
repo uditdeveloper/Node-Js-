@@ -1,2 +1,27 @@
 1. Packages -> Kisi Ne Code Phle Se bnaya h Hum use apne liye use krtge h Code (Npm Js) || Website m code milta h Node_modules Dependencies Se pta chla h . 
-dfghdfg
+
+2. npm init -y => nodejs aplication initiate 
+
+npm i express => install express package 
+
+server.js -> 
+
+const express = require('express');
+
+const app = express()  // server create
+
+app.get("/", (req, res) => {
+   res.send("Hello World!")
+})
+// Req -> Jo data frontend se aa skta h 
+// Res -> Jo data frontend  m display hota h 
+
+app.get("/about", (req, res) => {
+    res.send("About Us");
+})
+
+app.listen(3000)    // start server
+
+/********************What is api *************************/
+
+Rest Api -> HTTP protocal
