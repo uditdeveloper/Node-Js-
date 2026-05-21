@@ -25,3 +25,10 @@ app.listen(3000)    // start server
 /********************What is api *************************/
 
 Rest Api -> HTTP protocal
+
+GET POST PUT PATCH DELETE. 
+
+GET => Server se data lena ho Tab use 
+POST => server per data sent krna ho 
+PATCH => server per data ko change krne ke liye (Update)
+DELETE => ser Data DELETE Krna ho 
