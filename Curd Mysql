@@ -1,0 +1,203 @@
+// db.js
+
+import mysql from 'mysql2/promise'
+
+const db = await mysql.createConnection({
+
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: 'crud_app'
+
+
+});
+
+console.log('mysql connect');
+
+export default db;
+
+
+// ======================================
+// app file
+// ======================================
+
+import express from 'express'
+
+import db from './db.js';
+
+
+const app = express();
+
+app.use(express.json());
+
+
+// ======================================
+// CREATE USER
+// ======================================
+
+app.post('/users', async (req, res) => {
+
+    const { name, email } = req.body;
+
+    try {
+
+        const sql = `
+            INSERT INTO users (name, email)
+            VALUES (?, ?)
+        `;
+
+        const [result] = await db.execute(sql, [name, email]);
+
+        res.json({
+            message: 'User Created',
+            userId: result.insertId
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: 'Error creating user'
+        });
+    }
+});
+
+
+
+// ======================================
+// GET ALL USERS
+// ======================================
+
+app.get('/users', async (req, res) => {
+
+    try {
+
+        const sql = `SELECT * FROM users`;
+
+        const [rows] = await db.execute(sql);
+
+        res.json(rows);
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: 'Error fetching users'
+        });
+    }
+});
+
+
+
+// ======================================
+// GET SINGLE USER
+// ======================================
+
+app.get('/users/:id', async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const sql = `
+            SELECT * FROM users
+            WHERE id = ?
+        `;
+
+        const [rows] = await db.execute(sql, [id]);
+
+        res.json(rows[0]);
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: 'Error fetching user'
+        });
+    }
+});
+
+
+
+// ======================================
+// UPDATE USER
+// ======================================
+
+app.put('/users/:id', async (req, res) => {
+
+    const { id } = req.params;
+
+    const { name, email } = req.body;
+
+    try {
+
+        const sql = `
+            UPDATE users
+            SET name = ?, email = ?
+            WHERE id = ?
+        `;
+
+        await db.execute(sql, [name, email, id]);
+
+        res.json({
+            message: 'User Updated'
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: 'Error updating user'
+        });
+    }
+});
+
+
+
+// ======================================
+// DELETE USER
+// ======================================
+
+app.delete('/users/:id', async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const sql = `
+            DELETE FROM users
+            WHERE id = ?
+        `;
+
+        await db.execute(sql, [id]);
+
+        res.json({
+            message: 'User Deleted'
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: 'Error deleting user'
+        });
+    }
+});
+
+
+
+
+// ======================================
+// SERVER
+// ======================================
+
+app.listen(3000, () => {
+
+    console.log('Server Running On Port 3000');
+
+});
