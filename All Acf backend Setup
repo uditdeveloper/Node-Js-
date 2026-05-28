@@ -1,15 +1,41 @@
-/****************All Acf Backend Work **** */
-require get_template_directory() . '/inc/controllers/function.php';
+<?php
+
+/************************************************************
+ * ACF BACKEND SETUP
+ * ----------------------------------------------------------
+ * Yaha hum:
+ * 1. Required files include kar rahe hain
+ * 2. Flexible Content register kar rahe hain
+ * 3. Layouts load kar rahe hain
+ ************************************************************/
+
 
 /**
- * Implement the Acf Backend.
+ * Common Functions File
+ */
+require get_template_directory() . '/inc/controllers/function.php';
+
+
+/**
+ * ACF Components Register File
  */
 require get_template_directory() . '/acf/register-page-components.php';
 
 
 
-register /// 
+/************************************************************
+ * LOAD LAYOUT FILES
+ * ----------------------------------------------------------
+ * Har component ka ek alag layout file hoga.
+ * Example:
+ * banner.php
+ * hero.php
+ * faq.php
+ ************************************************************/
 
+/**
+ * Banner Layout Load Function
+ */
 function get_layout_banner()
 {
     return include get_template_directory() . '/acf/layouts/banner.php';
@@ -18,57 +44,133 @@ function get_layout_banner()
 
 
 
-add_action('acf/init', function () {
-    acf_add_local_field_group([
-        'key' => 'group_page_components',
-        'title' => 'Components',
-        'fields' => [
-            [
-                'key' => 'field_page_components',
-                'label' => 'Components',
-                'name' => 'page_components',
-                'type' => 'flexible_content',
-                'button_label' => 'Components',
-                'layouts' => [
-                    get_layout_banner(),
-                   
-              ]
-            ]
-        ],
-       
-'location' => [
-    [
-        [
-            'param' => 'post_type',
-            'operator' => '==',
-            'value' => 'page',
-        ],
-    ],
-  
- 
-  
-    
-],
+/************************************************************
+ * REGISTER FLEXIBLE CONTENT FIELD
+ * ----------------------------------------------------------
+ * Ye ACF Flexible Content create karega
+ * jisme multiple components add kar sakte hain.
+ ************************************************************/
 
-        'style' => 'default',      // <-- change 'seamless' to 'default'
-        'position' => 'normal',    // <-- add this line
+add_action('acf/init', function () {
+
+    acf_add_local_field_group([
+
+        // Group unique key
+        'key' => 'group_page_components',
+
+        // Backend title
+        'title' => 'Components',
+
+        // All fields
+        'fields' => [
+
+            [
+                // Flexible content field key
+                'key' => 'field_page_components',
+
+                // Backend label
+                'label' => 'Components',
+
+                // Field name
+                'name' => 'page_components',
+
+                // Flexible content type
+                'type' => 'flexible_content',
+
+                // Add layout button text
+                'button_label' => 'Add Component',
+
+                // All layouts
+                'layouts' => [
+
+                    // Banner Layout
+                    get_layout_banner(),
+
+                ]
+            ]
+
+        ],
+
+
+
+        /********************************************************
+         * LOCATION RULE
+         * ------------------------------------------------------
+         * Ye sirf Pages ke andar show hoga.
+         ********************************************************/
+        'location' => [
+            [
+                [
+                    'param' => 'post_type',
+                    'operator' => '==',
+                    'value' => 'page',
+                ],
+            ],
+        ],
+
+
+
+        /********************************************************
+         * UI SETTINGS
+         ********************************************************/
+        'style' => 'default',
+        'position' => 'normal',
         'menu_order' => 0,
+
     ]);
 });
 
 
 
-/**************Backend *****/
+
+Banner Layout File
+
+📁 acf/layouts/banner.php
+
 
 <?php
-if (!defined('ABSPATH')) { exit; }
+
+/**
+ * Security Check
+ * --------------------------------------------------
+ * Direct file access prevent karta hai
+ */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+
+/**
+ * Banner Layout Return
+ * --------------------------------------------------
+ * Ye pura ACF layout return karega
+ */
 
 return [
+
+    // Unique layout key
     'key' => 'layout_banner',
+
+    // Layout slug
     'name' => 'banner',
+
+    // Backend visible title
     'label' => 'Banner Slider',
+
+    // Layout display type
     'display' => 'block',
+
+
+
+
+    /************************************************
+     * ALL FIELDS
+     ************************************************/
     'sub_fields' => [
+
+        /**
+         * TAB
+         */
         [
             'key' => 'tab_general',
             'label' => 'General',
@@ -77,6 +179,13 @@ return [
             'placement' => 'top',
         ],
 
+
+
+        /**
+         * SECTION ID
+         * Example:
+         * hero-section
+         */
         [
             'key' => 'field_banner_section_id',
             'label' => 'Section ID',
@@ -84,6 +193,13 @@ return [
             'type' => 'text',
         ],
 
+
+
+        /**
+         * CUSTOM CSS CLASS
+         * Example:
+         * dark-section
+         */
         [
             'key' => 'field_banner_css_class',
             'label' => 'CSS Class',
@@ -91,6 +207,12 @@ return [
             'type' => 'text',
         ],
 
+
+
+        /**
+         * HIDE SECTION OPTION
+         * Agar ON hoga toh frontend pe section hide ho jayega
+         */
         [
             'key' => 'field_banner_hide_section',
             'label' => 'Hide Section',
@@ -99,6 +221,11 @@ return [
             'ui' => 1,
         ],
 
+
+
+        /**
+         * TITLE FIELD
+         */
         [
             'key' => 'field_banner_title',
             'label' => 'Title',
@@ -106,6 +233,11 @@ return [
             'type' => 'text',
         ],
 
+
+
+        /**
+         * DESCRIPTION FIELD
+         */
         [
             'key' => 'field_banner_description',
             'label' => 'Description',
@@ -118,58 +250,130 @@ return [
 ];
 
 
-/**************Fronented *****/
+Frontend Component File
+
+📁 template-parts/components/banner.php
 
 
-<?php if (get_sub_field('hide_section')) return; ?>
+<?php
 
-<section 
-    class="hero-slider <?php echo esc_attr(get_sub_field('css_class')); ?>" 
+/**
+ * Hide Section Check
+ * --------------------------------------------------
+ * Agar backend me hide_section ON hai
+ * toh ye component render nahi hoga
+ */
+if (get_sub_field('hide_section')) {
+    return;
+}
+
+?>
+
+
+<section
+
+    <!-- Dynamic CSS Classes -->
+    class="hero-slider <?php echo esc_attr(get_sub_field('css_class')); ?>"
+
+    <!-- Dynamic Section ID -->
     id="<?php echo esc_attr(get_sub_field('section_id')); ?>"
 >
 
     <div class="container">
 
+
         <?php if (get_sub_field('title')) : ?>
+
+            <!-- Banner Title -->
             <h2 class="hero-slider__title">
+
                 <?php echo esc_html(get_sub_field('title')); ?>
+
             </h2>
+
         <?php endif; ?>
 
+
+
         <?php if (get_sub_field('description')) : ?>
+
+            <!-- Banner Description -->
             <div class="hero-slider__description">
+
                 <?php echo wp_kses_post(get_sub_field('description')); ?>
+
             </div>
+
         <?php endif; ?>
+
 
     </div>
 
 </section>
 
-/*******Page diapoly**/
+
+Page Template Display
+
+📁 page.php
 
 
 <?php
 /**
- * The template for displaying all pages
- *
+ * Template Name: Default Page
+ * --------------------------------------------------
+ * Ye file sab pages render karegi
  */
 
 get_header();
 ?>
 
-<?php
-if (have_rows('page_components')) :
-    while (have_rows('page_components')) : the_row();
 
+
+<?php
+
+/**
+ * Flexible Content Loop
+ * --------------------------------------------------
+ * Har component ko loop me load karega
+ */
+
+if (have_rows('page_components')) :
+
+    while (have_rows('page_components')) :
+
+        the_row();
+
+        /**
+         * Current Layout Name
+         * Example:
+         * banner
+         * faq
+         * hero
+         */
         $layout = get_row_layout();
-        // Load the matching template partial for the layout
-        get_template_part('template-parts/components/' . $layout);
+
+
+
+        /**
+         * Dynamic Component Load
+         * ------------------------------------------------
+         * Ye automatically matching file load karega
+         *
+         * Example:
+         * banner => banner.php
+         */
+        get_template_part(
+            'template-parts/components/' . $layout
+        );
 
     endwhile;
+
 endif;
+
 ?>
 
-<?php
-get_footer();
+
+
+<?php get_footer(); ?>
+
 
